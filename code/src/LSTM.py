@@ -14,7 +14,8 @@ class RNNencoder(nn.Module):
 
         # print(src.shape ,src_padding_mask.shape)
         if src_padding_mask is not None :
-            length = (~src_padding_mask).sum(1).int().numpy()
+            length = (~src_padding_mask).sum(1).to('cpu', torch.int64)
+            # length = torch.sum(~src_padding_mask, dim=1)
             act = src.permute(1,0,2)
             
             x = nn.utils.rnn.pack_padded_sequence(act, length, batch_first=True, enforce_sorted=False)
@@ -38,7 +39,9 @@ class RNNdecoder(torch.nn.Module):
     def forward(self, input, memory, hidden ,tgt_padding_mask = None): # memory для attention
         
         if tgt_padding_mask is not None :
-            length = (~tgt_padding_mask).sum(1).int().numpy()
+            length = (~tgt_padding_mask).sum(1).to('cpu', torch.int64)
+            # length = length.to('cpu')
+            # length = torch.sum(~tgt_padding_mask, dim=1)
             act = input.permute(1,0,2)
             x = nn.utils.rnn.pack_padded_sequence(act, length, batch_first=True, enforce_sorted=False)
             out, hidden = self.lstm(x , hidden)
