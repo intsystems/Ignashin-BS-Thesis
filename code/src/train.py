@@ -222,8 +222,13 @@ def evaluate(model, val_iter, **kwargs):
         losses += loss.item()
 
         # ------------------------
+<<<<<<< HEAD
         if idx > 5 :
             break
+=======
+        # if idx > 5 :
+        #     break
+>>>>>>> 6319438 (Added RNN training)
 
     return losses / len(val_iter)
 
@@ -283,8 +288,13 @@ def bleu_calculate(model, data_iter, decoder=greedy_decode, **kwargs):
                 )
             )
         # --------------------------------------ATTENTION
+<<<<<<< HEAD
         if idx > 5 :
             break
+=======
+        # if idx > 5 :
+        #     break
+>>>>>>> 6319438 (Added RNN training)
     return np.mean(bleus)
 
 
@@ -333,8 +343,13 @@ def train_epoch(model, train_iter, optimizer, **kwargs):
         losses += loss.item()
 
         # ---------------------ATTENTION
+<<<<<<< HEAD
         if idx > 5 :
             break
+=======
+        # if idx > 5 :
+        #     break
+>>>>>>> 6319438 (Added RNN training)
 
         # break # ---------------------------------------------------------------------------------ATTENTION!!!!!!!!!!!!!!!!!!!!!!!!!!!----------------------------------
     return losses / len(train_iter)
