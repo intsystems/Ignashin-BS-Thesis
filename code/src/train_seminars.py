@@ -5,15 +5,21 @@ from torch import Tensor
 from tqdm import tqdm
 import numpy as np
 
+
+
+
 def train_on_batch(model, x_batch, y_batch, optimizer, loss_function):
     model.train()
     optimizer.zero_grad()
     
-    # print(x_batch.shape , y_batch.shape)
+    print(x_batch.shape , y_batch.shape)
+    print(x_batch , y_batch)
     x_batch =x_batch.permute(1,0)
     y_batch =y_batch.permute(1,0)
     output = model(x_batch.to(model.device), y_batch.to(model.device))
     
+
+    print(output.transpose(1,2)[0] , y_batch[0] )
     loss = loss_function(output.transpose(1,2), 
                          y_batch.to(model.device))
     loss.backward()
@@ -36,6 +42,7 @@ def train_epoch(train_generator, model, loss_function, optimizer, callback = Non
     
     return epoch_loss/total
 
+
 def trainer(count_of_epoch, 
             batch_size, 
             dataloader,
@@ -48,9 +55,10 @@ def trainer(count_of_epoch,
 
     optima = optimizer(model.parameters(), lr=lr)
     
-    iterations = tqdm(range(count_of_epoch), desc='epoch')
-    iterations.set_postfix({'train epoch loss': np.nan})
-    for it in iterations:
+    # iterations = tqdm(range(count_of_epoch), desc='epoch')
+    # iterations.set_postfix({'train epoch loss': np.nan})
+    iterations = count_of_epoch
+    for it in range(iterations):
         # batch_generator = tqdm(
         #     dataloader, 
         #     leave=False, total=len(dataset)//batch_size+(len(dataset)%batch_size>0))
@@ -60,5 +68,5 @@ def trainer(count_of_epoch,
                     loss_function=loss_function, 
                     optimizer=optima, 
                     callback=callback)
-        
-        iterations.set_postfix({'train epoch loss': epoch_loss})
+        print('train epoch loss: ', epoch_loss)
+        # iterations.set_postfix({'train epoch loss': epoch_loss})
