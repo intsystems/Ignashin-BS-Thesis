@@ -15,7 +15,6 @@ class RNNencoder(nn.Module):
         # print(src.shape ,src_padding_mask.shape)
         if src_padding_mask is not None :
             length = (~src_padding_mask).sum(1).to('cpu', torch.int64)
-            # length = torch.sum(~src_padding_mask, dim=1)
             act = src.permute(1,0,2)
             
             x = nn.utils.rnn.pack_padded_sequence(act, length, batch_first=True, enforce_sorted=False)
@@ -40,8 +39,6 @@ class RNNdecoder(torch.nn.Module):
         
         if tgt_padding_mask is not None :
             length = (~tgt_padding_mask).sum(1).to('cpu', torch.int64)
-            # length = length.to('cpu')
-            # length = torch.sum(~tgt_padding_mask, dim=1)
             act = input.permute(1,0,2)
             x = nn.utils.rnn.pack_padded_sequence(act, length, batch_first=True, enforce_sorted=False)
             out, hidden = self.lstm(x , hidden)
@@ -49,18 +46,6 @@ class RNNdecoder(torch.nn.Module):
         else :
             act = input.permute(1,0,2)
             out, hidden = self.lstm(act , hidden)
-        # act, _ = self.attention(act.transpose(0, 1),
-        #                         encoder_outputs.transpose(0, 1),
-        #                         encoder_outputs.transpose(0, 1))
-        # result = []
-        # for i in range(input.shape[0]) :
-        #     act = input[i:i+1,:,:]
-        #     act = act.permute(1,0,2)
-        #     act, hidden = self.lstm(act,  (hidden[0] , hidden[1]))
-        #     result.append(act)
-
-        # result = torch.stack(result).squeeze(2)
-
         return out
     
 class Seq2SeqRNN(nn.Module):
@@ -76,20 +61,25 @@ class Seq2SeqRNN(nn.Module):
         self.generator = nn.Linear(hidden_size, tgt_vocab_size)
         self.src_tok_emb = TokenEmbedding(src_vocab_size, emb_size)
         self.tgt_tok_emb = TokenEmbedding(tgt_vocab_size, emb_size)
-        self.positional_encoding = PositionalEncoding(emb_size, dropout=dropout)
+        # self.positional_encoding = PositionalEncoding(emb_size, dropout=dropout)
 
     def forward(self, src: Tensor, trg: Tensor, src_mask: Tensor,
                 tgt_mask: Tensor, src_padding_mask: Tensor,
                 tgt_padding_mask: Tensor, memory_key_padding_mask: Tensor): # src_mask ,tgt_mask ,memory_key_mask - не используются
-        src_emb = self.positional_encoding(self.src_tok_emb(src))
-        tgt_emb = self.positional_encoding(self.tgt_tok_emb(trg))
+        # src_emb = self.positional_encoding(self.src_tok_emb(src))
+        # tgt_emb = self.positional_encoding(self.tgt_tok_emb(trg))
+        src_emb = self.src_tok_emb(src)
+        tgt_emb = self.tgt_tok_emb(trg)
         memory, hidden  = self.rnn_encoder(src_emb , src_padding_mask)
         outs = self.rnn_decoder(tgt_emb, memory, hidden , tgt_padding_mask)
         return self.generator(outs)
 
     def encode(self, src: Tensor, src_padding_mask = None): # src_mask - не используется
-        return self.rnn_encoder(self.positional_encoding(self.src_tok_emb(src)) , src_padding_mask)
+        # return self.rnn_encoder(self.positional_encoding(self.src_tok_emb(src)) , src_padding_mask)
+        return self.rnn_encoder(self.src_tok_emb(src) , src_padding_mask)
 
     def decode(self, tgt: Tensor, memory: Tensor,   hidden : Tensor , tgt_padding_mask = None ):
         # print(tgt_mask)
-        return self.rnn_decoder(self.positional_encoding(self.tgt_tok_emb(tgt)), memory , hidden , tgt_padding_mask)
+        # return self.rnn_decoder(self.positional_encoding(self.tgt_tok_emb(tgt)), memory , hidden , tgt_padding_mask)
+        return self.rnn_decoder(self.tgt_tok_emb(tgt), memory , hidden , tgt_padding_mask)
+
