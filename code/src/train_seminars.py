@@ -51,10 +51,10 @@ def trainer(count_of_epoch,
     iterations = tqdm(range(count_of_epoch), desc='epoch')
     iterations.set_postfix({'train epoch loss': np.nan})
     for it in iterations:
-        batch_generator = tqdm(
-            dataloader, 
-            leave=False, total=len(dataset)//batch_size+(len(dataset)%batch_size>0))
-        
+        # batch_generator = tqdm(
+        #     dataloader, 
+        #     leave=False, total=len(dataset)//batch_size+(len(dataset)%batch_size>0))
+        batch_generator = dataloader
         epoch_loss = train_epoch(train_generator=batch_generator, 
                     model=model, 
                     loss_function=loss_function, 
