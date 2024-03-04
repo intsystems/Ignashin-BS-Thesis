@@ -12,14 +12,14 @@ def train_on_batch(model, x_batch, y_batch, optimizer, loss_function):
     model.train()
     optimizer.zero_grad()
     
-    print(x_batch.shape , y_batch.shape)
-    print(x_batch , y_batch)
+    # print(x_batch , y_batch)
     x_batch =x_batch.permute(1,0)
     y_batch =y_batch.permute(1,0)
+    print(x_batch.shape , y_batch.shape)
     output = model(x_batch.to(model.device), y_batch.to(model.device))
     
 
-    print(output.transpose(1,2)[0] , y_batch[0] )
+    print(output.transpose(1,2).shape , y_batch.shape )
     loss = loss_function(output.transpose(1,2), 
                          y_batch.to(model.device))
     loss.backward()

@@ -76,7 +76,7 @@ class seq2seq(torch.nn.Module):
             translated_scores[:, 0, input[:, 0]] = 1.
             for i in range(1, max_seq_len):
                 translated_scores[:, i:i+1], hidden = self.decoder(
-                    torch.argmax(translated_scores[:, 0:i], axis=-1), 
+                    torch.argmax(translated_scores[:,  i-1:i], axis=-1), 
                     encoder_output, 
                     hidden)
         else:
