@@ -122,7 +122,7 @@ class Seq2Seq(nn.Module):
         outputs = torch.zeros(max_len, batch_size, trg_vocab_size).to(self.device)
         encoder_output ,hidden = self.encoder(src)
         if self.without_attention :
-            encoder_output = torch.sum(encoder_output, dim=0).unsqueeze(0)
+            encoder_output = torch.mean(encoder_output, dim=0).unsqueeze(0)
             # print(encoder_output.shape)
         input = trg[0,:]
         
