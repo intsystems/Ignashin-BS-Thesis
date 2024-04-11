@@ -114,7 +114,7 @@ class Seq2Seq(nn.Module):
         self.decoder = decoder
         self.device = device
         self.without_attention = without_attention
-        assert self.decoder.ar
+        # assert self.decoder.ar
     def forward(self, src, trg, teacher_forcing_ratio = 0.5):
         batch_size = trg.shape[1]
         max_len = trg.shape[0]
