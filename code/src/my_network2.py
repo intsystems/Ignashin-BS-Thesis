@@ -85,6 +85,7 @@ class Decoder(nn.Module):
         self.dropout = nn.Dropout(p=dropout)# <YOUR CODE HERE>
     def forward(self, input, encoder_output , hidden):
         input = input.unsqueeze(0)
+        # print(input.shape)
         embedded = self.dropout(self.embedding(input))# <YOUR CODE HERE>
         query = hidden[0].permute(1, 0, 2)
         
@@ -116,13 +117,31 @@ class Seq2Seq(nn.Module):
         self.without_attention = without_attention
         
     def forward(self, src, trg, teacher_forcing_ratio = 0.5):
+        # print('Start')
         batch_size = trg.shape[1]
         max_len = trg.shape[0]
         trg_vocab_size = self.decoder.output_dim
         outputs = torch.zeros(max_len, batch_size, trg_vocab_size).to(self.device)
+
         encoder_output ,hidden = self.encoder(src)
+        # print('test')
+        # print(src.shape)
+        # print(encoder_output.shape)
+        mask = (src != 2).unsqueeze(-1)
+        # print(mask.shape)
+        counts = mask.sum(0)
+        # print(counts.shape)
+
         if self.without_attention :
-            encoder_output = torch.mean(encoder_output, dim=0).unsqueeze(0)
+
+            # encoder_output = encoder_output.mean(dim = -1)
+
+            encoder_output = encoder_output*mask 
+            # print(encoder_output.shape, counts.shape)
+            # print(encoder_output.sum(dim=0).shape)
+
+            encoder_output = encoder_output.sum(dim=0) / counts
+            encoder_output = encoder_output.unsqueeze(0)
             # print(encoder_output.shape)
         input = trg[0,:]
         
